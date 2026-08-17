@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server Rules</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html {
+    height:100%;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Poppins', sans-serif;
+    background:
+      radial-gradient(ellipse 900px 600px at 85% -5%, rgba(255,196,0,0.28), transparent 60%),
+      radial-gradient(ellipse 800px 600px at 5% 100%, rgba(230,20,20,0.32), transparent 60%),
+      linear-gradient(160deg, #0A0505 0%, #180808 50%, #0C0A02 100%);
+    min-height:100%;
+    height:auto;
+    color:#FBF0E8;
+    padding:60px 20px;
+    position:relative;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* dot grid */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1.1px, transparent 1.1px);
+    background-size:26px 26px;
+    -webkit-mask-image: radial-gradient(ellipse 900px 700px at 75% 10%, black 0%, transparent 70%);
+    mask-image: radial-gradient(ellipse 900px 700px at 75% 10%, black 0%, transparent 70%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .blob { position:fixed; border-radius:50%; filter:blur(100px); z-index:0; pointer-events:none; }
+  .blob.red { width:460px; height:460px; top:-140px; left:-140px; background:#E61414; opacity:0.30; }
+  .blob.gold { width:420px; height:420px; bottom:-160px; right:-120px; background:#FFC400; opacity:0.25; }
+
+  /* shooting stars */
+  .stars { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .star {
+    position:absolute;
+    width:2px; height:2px;
+    background:#FFF3D6;
+    border-radius:50%;
+    box-shadow:0 0 6px 1px rgba(255,220,150,0.8);
+  }
+  .shooting {
+    position:absolute;
+    width:140px; height:2px;
+    background: linear-gradient(90deg, rgba(255,220,150,1), rgba(255,220,150,0));
+    border-radius:2px;
+    opacity:0;
+    animation: shoot 6s linear infinite;
+  }
+  .shooting.s1 { top:8%; left:-10%; animation-delay:0s; }
+  .shooting.s2 { top:22%; left:-10%; animation-delay:2s; }
+  .shooting.s3 { top:40%; left:-10%; animation-delay:4.2s; }
+  .shooting.s4 { top:60%; left:-10%; animation-delay:1.3s; }
+  .shooting.s5 { top:75%; left:-10%; animation-delay:5s; }
+
+  @keyframes shoot {
+    0%   { transform: translate(0,0) rotate(18deg); opacity:0; }
+    5%   { opacity:1; }
+    25%  { transform: translate(120vw, 45vh) rotate(18deg); opacity:0; }
+    100% { transform: translate(120vw, 45vh) rotate(18deg); opacity:0; }
+  }
+
+  .wrap {
+    position:relative;
+    z-index:2;
+    max-width:820px;
+    margin:0 auto;
+  }
+
+  .frame {
+    border:1px solid rgba(255,255,255,0.09);
+    border-radius:26px;
+    padding:56px 50px;
+    background: rgba(15,8,6,0.40);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 30px 90px -40px rgba(0,0,0,0.65);
+  }
+
+  .header { text-align:center; margin-bottom:36px; }
+
+  .server-badge {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 18px;
+    border-radius:30px;
+    background: linear-gradient(135deg, rgba(230,20,20,0.18), rgba(255,196,0,0.14));
+    border:1px solid rgba(255,196,0,0.4);
+    font-size:13px;
+    font-weight:700;
+    color:#FFD98A;
+    letter-spacing:0.5px;
+    margin-bottom:22px;
+  }
+  .server-badge .dot {
+    width:7px; height:7px;
+    border-radius:50%;
+    background:#FF4D4D;
+    box-shadow:0 0 8px rgba(255,77,77,0.9);
+  }
+
+  .icon-badge {
+    width:72px; height:72px;
+    margin:0 auto 20px auto;
+    border-radius:20px;
+    background: linear-gradient(145deg, rgba(230,20,20,0.28), rgba(255,196,0,0.16));
+    border:1px solid rgba(255,255,255,0.15);
+    box-shadow:0 0 34px rgba(230,20,20,0.4), 0 0 34px rgba(255,196,0,0.18);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .icon-badge svg { width:34px; height:34px; }
+
+  .eyebrow {
+    font-size:13px;
+    letter-spacing:6px;
+    background: linear-gradient(90deg, #FF8A8A, #FFD98A);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    font-weight:700;
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+
+  h1 {
+    font-weight:800;
+    font-size:46px;
+    letter-spacing:1px;
+    background: linear-gradient(90deg, #FFD9D9 10%, #FFE29A 90%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow: 0 0 50px rgba(230,20,20,0.2);
+    margin-bottom:14px;
+  }
+
+  .underline {
+    width:110px; height:3px;
+    margin:0 auto;
+    background: linear-gradient(90deg, transparent, #E61414, #FFC400, transparent);
+    border-radius:4px;
+  }
+
+  .subtitle {
+    margin-top:18px;
+    font-size:14.5px;
+    color:#CBAFA0;
+  }
+
+  .rules { display:flex; flex-direction:column; gap:14px; }
+
+  .rule {
+    display:flex;
+    align-items:flex-start;
+    gap:18px;
+    padding:20px 24px;
+    border-radius:16px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+    border:1px solid rgba(255,255,255,0.08);
+  }
+
+  .rule:nth-child(odd) { border-left:3px solid rgba(230,20,20,0.55); }
+  .rule:nth-child(even) { border-left:3px solid rgba(255,196,0,0.55); }
+
+  .num {
+    flex-shrink:0;
+    width:42px; height:42px;
+    border-radius:12px;
+    background: linear-gradient(145deg, rgba(230,20,20,0.24), rgba(255,196,0,0.14));
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800;
+    font-size:16px;
+    color:#FFEBD2;
+  }
+
+  .rule-title {
+    font-weight:800;
+    font-size:18px;
+    color:#FFF6EC;
+    margin-bottom:5px;
+    letter-spacing:0.3px;
+  }
+
+  .rule-desc {
+    font-size:14px;
+    color:#C7AFA0;
+    line-height:1.55;
+  }
+
+  .footer {
+    margin-top:30px;
+    padding:20px 26px;
+    border-radius:16px;
+    background: linear-gradient(135deg, rgba(255,196,0,0.14), rgba(230,20,20,0.12));
+    border:1px solid rgba(255,196,0,0.4);
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .warn-icon {
+    width:36px; height:36px;
+    flex-shrink:0;
+    border-radius:10px;
+    background:rgba(230,20,20,0.24);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  .footer-text { font-size:14.5px; color:#FFE4C2; font-weight:500; line-height:1.5; }
+  .footer-text b { color:#FFC400; }
+
+  .bottom-note {
+    text-align:center;
+    margin-top:30px;
+    font-size:12.5px;
+    color:#8A7060;
+    letter-spacing:0.5px;
+  }
+
+  @media (max-width:600px) {
+    .frame { padding:36px 24px; }
+    h1 { font-size:34px; }
+  }
+</style>
+</head>
+<body>
+  <div class="blob red"></div>
+  <div class="blob gold"></div>
+
+  <div class="stars">
+    <div class="shooting s1"></div>
+    <div class="shooting s2"></div>
+    <div class="shooting s3"></div>
+    <div class="shooting s4"></div>
+    <div class="shooting s5"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="frame">
+      <div class="header">
+        <div class="server-badge"><span class="dot"></span>Discord: x.bussiness</div>
+
+        <div class="icon-badge">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="#FFF6EC" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="eyebrow">Please Read Before Participating</div>
+        <h1>Server Rules</h1>
+        <div class="underline"></div>
+        <div class="subtitle">Follow these rules to keep our community safe, fair, and enjoyable for everyone.</div>
+      </div>
+
+      <div class="rules">
+        <div class="rule">
+          <div class="num">1</div>
+          <div>
+            <div class="rule-title">Be Respectful</div>
+            <div class="rule-desc">No harassment, hate speech, racism, or discrimination of any kind. Treat every member with respect.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">2</div>
+          <div>
+            <div class="rule-title">No NSFW Content</div>
+            <div class="rule-desc">No explicit, violent, or inappropriate content anywhere in the server, including profile pictures and statuses.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">3</div>
+          <div>
+            <div class="rule-title">No Spamming</div>
+            <div class="rule-desc">No repeated messages, excessive caps, emoji spam, or mass mentions of members and roles.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">4</div>
+          <div>
+            <div class="rule-title">No Advertising</div>
+            <div class="rule-desc">No promoting other servers, links, or products without staff permission. DM advertising is also not allowed.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">5</div>
+          <div>
+            <div class="rule-title">No Impersonation</div>
+            <div class="rule-desc">Don't pretend to be staff, other members, bots, or public figures. Usernames should represent you honestly.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">6</div>
+          <div>
+            <div class="rule-title">Use Channels Properly</div>
+            <div class="rule-desc">Post content in the correct channel — off-topic messages will be removed or moved by staff.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">7</div>
+          <div>
+            <div class="rule-title">No Harmful Content</div>
+            <div class="rule-desc">No malware, scams, phishing links, IP grabbers, or NSFW/gore material of any kind.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">8</div>
+          <div>
+            <div class="rule-title">English Only</div>
+            <div class="rule-desc">Keep main channels in English so everyone in the community can understand and take part.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">9</div>
+          <div>
+            <div class="rule-title">Follow Discord ToS</div>
+            <div class="rule-desc">All Discord Terms of Service and Community Guidelines apply here, without exception.</div>
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="num">10</div>
+          <div>
+            <div class="rule-title">Listen to Staff</div>
+            <div class="rule-desc">Staff decisions are final. If you disagree, DM a moderator respectfully instead of arguing publicly.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="warn-icon">⚠️</div>
+        <div class="footer-text"><b>Violations result in warnings, timeouts, kicks, or bans</b> depending on severity and repetition.</div>
+      </div>
+
+      <div class="bottom-note">Thank you for being part of our community 🔥</div>
+    </div>
+  </div>
+</body>
+</html>
